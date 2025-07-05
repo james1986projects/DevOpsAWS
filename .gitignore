@@ -1,0 +1,33 @@
+# Byte-compiled / virtual env files
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+env/
+
+# Docker
+*.tar
+*.log
+docker-compose.override.yml
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+crash.log
+*.tfvars
+override.tf
+override.tf.json
+terraform.tfvars.json
+*.backup
+
+# VS Code / IDEs
+.vscode/
+.idea/
+*.swp
+
+# MacOS / Linux
+.DS_Store
