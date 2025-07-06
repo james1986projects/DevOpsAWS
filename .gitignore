@@ -31,3 +31,4 @@ terraform.tfvars.json
 
 # MacOS / Linux
 .DS_Store
+.ssh/*.pem
