@@ -1,87 +1,65 @@
-# Secure AWS WebApp Deployment 🚀
+# 🚀 Secure AWS WebApp Deployment
 
-This project showcases how to securely deploy a containerized Python Flask web application to **AWS ECS Fargate** using **Terraform** and **Docker**. It's part of my ongoing learning in DevOps and AWS cloud architecture. The project is modular, production-oriented, and well-documented with lessons learned and troubleshooting notes.
+This project demonstrates how to securely deploy a containerized Flask web application to AWS ECS Fargate using Docker and Terraform.
 
-The infrastructure is built with **Infrastructure as Code** (IaC) using Terraform, and will continue to evolve over time with new features like S3 static hosting and DynamoDB integration.
+As part of my continued learning in DevOps and cloud architecture, I'm building a production-style deployment from the ground up. The architecture will evolve over time, and I'll document troubleshooting steps and lessons learned along the way.
 
 ---
 
-## 🔧 Tech Stack
+## 🔧 Technologies Used
 
-- **AWS ECS Fargate**
-- **Application Load Balancer (ALB)**
-- **Amazon Elastic Container Registry (ECR)**
-- **AWS CloudWatch**
-- **Terraform**
-- **Docker**
-- **Python Flask**
+- AWS ECS Fargate  
+- Docker  
+- Amazon ECR  
+- Application Load Balancer (ALB)  
+- AWS CloudWatch  
+- Terraform  
+- Python Flask  
 
 ---
 
 ## 📌 Project Highlights
 
-- ✅ Containerized Flask app using Docker
-- ✅ Infrastructure provisioned with Terraform
-- ✅ Load-balanced ECS Fargate service
-- ✅ Centralized logging with CloudWatch
-- ✅ Clean, modular repo structure for scalability
-- ✅ GitHub documentation with troubleshooting and diagrams
+- Containerized Flask app with Docker  
+- Infrastructure as Code using Terraform  
+- Deployment to ECS Fargate with ALB routing  
+- CloudWatch log aggregation  
+- Modular and production-ready structure  
 
 ---
 
 ## 🗂️ Project Structure
 
-| Folder       | Description                             |
-|--------------|-----------------------------------------|
-| `/app`       | Flask application and Dockerfile setup  |
-| `/terraform` | All Terraform configurations (IaC)      |
-| `/docs`      | Architecture diagrams and screenshots   |
+| Folder      | Description                          |
+|-------------|--------------------------------------|
+| `/app`      | Flask app + Docker setup             |
+| `/terraform`| All Terraform configurations (IaC)   |
+| `/docs`     | Optional: screenshots, diagrams      |
 
 ---
 
 ## 📸 Architecture Diagram
 
-📌 *Coming Soon*  
-*(Will be added in `/docs/architecture.png` once created. See below for help on how to generate one.)*
+*Coming soon – a visual diagram of the infrastructure components.*
 
 ---
 
 ## 🚀 Quick Start
 
-**Note**: You’ll need an AWS account, Terraform installed, and Docker set up locally.
+### Prerequisites
+- AWS account
+- Docker installed
+- Terraform installed and configured
+
+### Deploy the App
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/secure-aws-webapp.git
+# Clone the repository
+git clone https://github.com/james1986projects/DevOpsAWS.git
 
-# 2. Navigate to Terraform configuration
-cd secure-aws-webapp/terraform
+# Navigate to the Terraform configuration
+cd DevOpsAWS/terraform
 
-# 3. Deploy the infrastructure
+# Deploy the infrastructure
 terraform init
 terraform apply
-The Flask app will be deployed to ECS Fargate and accessible via a load balancer.
-
-🧠 To-Do (Planned Improvements)
- Add HTTPS support (ACM + ALB)
-
- Integrate S3 for static file hosting or failover
-
- Add DynamoDB for backend storage
-
- Implement autoscaling for ECS tasks
-
- Add CI/CD pipeline via GitHub Actions
-
- Create and upload architecture diagram
-
-🙋‍♂️ Author
-James Peckitt
-
-GitHub Profile
-
-📧 james_peckitt1986@hotmail.com
-
-📜 AWS Certified Solutions Architect – Associate
-
-📜 CompTIA Security+ Certified
