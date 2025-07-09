@@ -46,3 +46,31 @@ resource "aws_iam_role_policy_attachment" "ecs_task_logging_attach" {
 }
 
 data "aws_caller_identity" "current" {}
+
+#adding iam policy for dynamodb
+
+resource "aws_iam_policy" "dynamodb_access" {
+  name = "dynamodb-access-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
+        ],
+        Effect   = "Allow",
+        Resource = aws_dynamodb_table.flask_data.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_dynamodb" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.dynamodb_access.arn
+}
