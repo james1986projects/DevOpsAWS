@@ -1,4 +1,5 @@
-### ecs.tf
+#ecs.tf
+
 resource "aws_ecs_cluster" "flask_cluster" {
   name = "flask-cluster"
 }
@@ -9,32 +10,34 @@ resource "aws_ecs_task_definition" "flask_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
 
+  execution_role_arn = aws_iam_role.ecs_task_execution.arn
+  task_role_arn      = aws_iam_role.ecs_task_execution.arn # You may want a separate task role later for DynamoDB
 
   container_definitions = jsonencode([
     {
-      name      = "flask-app",
-      image     = "124482837913.dkr.ecr.us-east-1.amazonaws.com/flask-app:latest",
-      essential = true,
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          awslogs-group         = "/ecs/flask-app",
-          awslogs-region        = "us-east-1",
-          awslogs-stream-prefix = "ecs"
-        }
-      },
+      name      = "flask-app"
+      image     = "${aws_ecr_repository.flask_app.repository_url}:latest"
+      essential = true
       portMappings = [
         {
-          containerPort = 5000,
+          containerPort = 5000
+          hostPort      = 5000
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.flask_log_group.name
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
-   depends_on = [aws_cloudwatch_log_group.flask_log_group]
+
+  depends_on = [aws_cloudwatch_log_group.flask_log_group]
 }
 
 resource "aws_ecs_service" "flask_service" {
