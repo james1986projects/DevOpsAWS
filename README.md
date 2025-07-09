@@ -14,7 +14,8 @@ As part of my continued learning in DevOps and cloud architecture, I'm building 
 - Application Load Balancer (ALB)  
 - AWS CloudWatch  
 - Terraform  
-- Python Flask  
+- Python Flask
+- DynamoDB 
 
 ---
 
@@ -24,7 +25,8 @@ As part of my continued learning in DevOps and cloud architecture, I'm building 
 - Infrastructure as Code using Terraform  
 - Deployment to ECS Fargate with ALB routing  
 - CloudWatch log aggregation  
-- Modular and production-ready structure  
+- Modular and production-ready structure
+- DynamoDB for backend data
 
 ---
 
@@ -53,7 +55,6 @@ As part of my continued learning in DevOps and cloud architecture, I'm building 
 
 ### Deploy the App
 
-```bash
 # Clone the repository
 git clone https://github.com/james1986projects/DevOpsAWS.git
 
