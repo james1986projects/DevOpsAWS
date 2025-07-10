@@ -1,35 +1,45 @@
+# Flask App for AWS Fargate with Docker and DynamoDB
 
-🐍 Flask App Setup for AWS Fargate with Docker and DynamoDB
-This guide explains how to build a Flask application using Docker, push it to Amazon ECR, and deploy it with Terraform to AWS ECS Fargate.
-The app integrates with DynamoDB to store and retrieve backend data.
+This guide explains how to build a Flask application using Docker, push it to Amazon ECR, and deploy it with Terraform to AWS ECS Fargate.  
+The app integrates with **DynamoDB** to store and retrieve backend data.
 
-🧠 App Overview
-This Flask app exposes a /data endpoint:
+---
 
-POST /data — Stores a new item in DynamoDB with a generated UUID.
+## App Overview
 
-GET /data — Retrieves all items from DynamoDB.
+This Flask app exposes a `/data` endpoint:
 
-🛠️ App Requirements
-Python 3.11
+- `POST /data` — Stores a new item in DynamoDB with a generated UUID.
+- `GET /data` — Retrieves all items from DynamoDB.
 
-Flask
+---
 
-boto3 (for DynamoDB access)
+## Requirements
 
-📁 App Structure
-Copy
-Edit
+- Python 3.11  
+- Flask  
+- boto3
+
+---
+
+## App Structure
+
 app/
 ├── app.py
 ├── requirements.txt
 └── Dockerfile
-🔧 Local Docker Build & Test (Optional)
-You can test locally before pushing to ECR:
 
-bash
+yaml
 Copy
 Edit
+
+---
+
+## Local Docker Build & Test (Optional)
+
+You can test the app locally before pushing to ECR:
+
+```bash
 docker build -t flask-aws-app .
 docker run -d -p 5000:5000 flask-aws-app
 Visit in your browser:
@@ -38,7 +48,7 @@ bash
 Copy
 Edit
 http://localhost:5000/data
-🐳 Dockerfile
+Dockerfile
 Dockerfile
 Copy
 Edit
@@ -55,13 +65,13 @@ COPY . .
 EXPOSE 5000
 
 CMD ["python", "app.py"]
-📦 requirements.txt
-nginx
+requirements.txt
+text
 Copy
 Edit
 flask
 boto3
-🚀 Build and Push Docker Image to Amazon ECR
+Build and Push Docker Image to Amazon ECR
 1. Authenticate Docker to ECR
 bash
 Copy
@@ -73,19 +83,19 @@ bash
 Copy
 Edit
 docker build -t flask-app:latest .
-3. Tag Image for ECR
+3. Tag Docker Image
 bash
 Copy
 Edit
 docker tag flask-app:latest <aws_account_id>.dkr.ecr.<aws-region>.amazonaws.com/flask-app:latest
-4. Push to ECR
+4. Push Image to ECR
 bash
 Copy
 Edit
 docker push <aws_account_id>.dkr.ecr.<aws-region>.amazonaws.com/flask-app:latest
-✅ This image is referenced in the ECS Task Definition created by Terraform.
+This image is referenced in the ECS Task Definition created by Terraform.
 
-✅ API Usage
+API Usage
 Add Data to DynamoDB
 bash
 Copy
@@ -93,7 +103,7 @@ Edit
 curl -X POST http://<ALB-DNS-NAME>/data \
   -H "Content-Type: application/json" \
   -d '{"value": "test123"}'
-Response:
+Example response:
 
 json
 Copy
@@ -107,22 +117,26 @@ bash
 Copy
 Edit
 curl http://<ALB-DNS-NAME>/data
-🧪 Deployment & Testing Notes
-App deployed via ECS Fargate using Terraform
+Deployment & Testing Notes
+Deployed to ECS Fargate using Terraform
 
-DynamoDB table (flask-data) created with Terraform
+DynamoDB table (flask-data) provisioned via Terraform
 
-Logs available in CloudWatch under /ecs/flask-app
+Logs viewable in CloudWatch Logs under /ecs/flask-app
 
-ECS task IAM role allows necessary DynamoDB actions (PutItem, Scan, etc.)
+ECS task IAM role scoped to allow necessary DynamoDB actions (PutItem, Scan, etc.)
 
-📌 Previously: EC2-based Setup (Deprecated)
-This project originally ran on an EC2 instance with manual Docker setup.
-It has now been fully migrated to ECS Fargate for improved automation, scalability, and production readiness.
+Migration Note: EC2 Setup Deprecated
+This project was originally hosted on an EC2 instance.
+It has been fully migrated to ECS Fargate for scalability, maintainability, and automation benefits.
 
-🛠 Troubleshooting Notes
-Resolved initial issues with Flask setup and Python environment by using Docker
+Troubleshooting
+Docker simplifies environment setup and avoids Python installation issues (e.g., PEP 668 on Ubuntu 22.04)
 
-Simplified setup by removing local Python dependencies and EC2 configuration
+No need for virtual environments or systemd — Docker manages lifecycle
 
-Docker handles all dependencies, networking, and execution logic
+Removed local EC2-specific setup and scripts for clarity
+
+yaml
+Copy
+Edit
