@@ -8,11 +8,11 @@ resource "aws_ecs_task_definition" "flask_task" {
   family                   = "flask-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = var.ecs_cpu
+  memory                   = var.ecs_memory
 
-  execution_role_arn = aws_iam_role.ecs_task_execution.arn
-  task_role_arn      = aws_iam_role.ecs_task_execution.arn # You may want a separate task role later for DynamoDB
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = aws_iam_role.ecs_task_app_role.arn
 
   container_definitions = jsonencode([
     {
@@ -30,7 +30,7 @@ resource "aws_ecs_task_definition" "flask_task" {
         logDriver = "awslogs"
         options = {
           awslogs-group         = aws_cloudwatch_log_group.flask_log_group.name
-          awslogs-region        = "us-east-1"
+          awslogs-region        = var.region
           awslogs-stream-prefix = "ecs"
         }
       }
@@ -61,3 +61,4 @@ resource "aws_ecs_service" "flask_service" {
 
   depends_on = [aws_lb_listener.http]
 }
+

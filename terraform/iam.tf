@@ -1,35 +1,18 @@
-### iam.tf
+#iam.tf
+
+data "aws_caller_identity" "current" {}
+
+# Task Execution Role: used by ECS to pull images, write logs
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Action    = "sts:AssumeRole",
       Effect    = "Allow",
-      Principal = {
-        Service = "ecs-tasks.amazonaws.com"
-      }
+      Principal = { Service = "ecs-tasks.amazonaws.com" },
+      Action    = "sts:AssumeRole"
     }]
-  })
-}
-
-resource "aws_iam_policy" "ecs_task_dynamodb_policy" {
-  name = "ecsTaskDynamoDBPolicy"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "dynamodb:PutItem",
-          "dynamodb:GetItem",
-          "dynamodb:Scan"
-        ],
-        Resource = "arn:aws:dynamodb:${var.region}:${data.aws_caller_identity.current.account_id}:table/${var.dynamodb_table_name}"
-      }
-    ]
   })
 }
 
@@ -45,15 +28,12 @@ resource "aws_iam_policy" "ecs_task_logging_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Action = [
           "logs:CreateLogStream",
           "logs:PutLogEvents"
-        ]
-        Resource = [
-  "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/flask-app:*"
-]
-
+        ],
+        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/flask-app:*"
       }
     ]
   })
@@ -64,9 +44,19 @@ resource "aws_iam_role_policy_attachment" "ecs_task_logging_attach" {
   policy_arn = aws_iam_policy.ecs_task_logging_policy.arn
 }
 
-data "aws_caller_identity" "current" {}
+# Task App Role: used by your Flask app (DynamoDB)
+resource "aws_iam_role" "ecs_task_app_role" {
+  name = "ecsTaskAppRole"
 
-#adding iam policy for dynamodb
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = { Service = "ecs-tasks.amazonaws.com" },
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
 
 resource "aws_iam_policy" "dynamodb_access" {
   name = "dynamodb-access-policy"
@@ -90,6 +80,6 @@ resource "aws_iam_policy" "dynamodb_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_dynamodb" {
-  role       = aws_iam_role.ecs_task_execution_role.name
+  role       = aws_iam_role.ecs_task_app_role.name
   policy_arn = aws_iam_policy.dynamodb_access.arn
 }
