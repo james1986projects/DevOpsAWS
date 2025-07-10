@@ -1,134 +1,132 @@
-# Terraform Infrastructure – Secure AWS Flask Web App
+# Terraform Infrastructure for Flask App on AWS Fargate
 
-This directory contains the Terraform code used to provision the infrastructure for a secure, containerized Flask application deployed on AWS ECS Fargate behind an Application Load Balancer (ALB). It is part of the [DevOpsAWS Project](https://github.com/james1986projects/DevOpsAWS).
+This Terraform configuration provisions a complete AWS infrastructure to run a Flask application in Docker on ECS Fargate, with DynamoDB for backend storage and CloudWatch for logging.
 
 ---
 
-## Directory Structure
+## 🗂️ Infrastructure Overview
+
+The Terraform setup includes:
+
+- VPC with public subnets and internet gateway  
+- Application Load Balancer (ALB) for HTTP traffic  
+- ECS Cluster & Fargate Service to run Docker containers  
+- IAM Roles for ECS task execution and DynamoDB access  
+- ECR Repository for storing the Docker image  
+- DynamoDB Table for backend data  
+- CloudWatch Logs for container logs  
+- Terraform variables and outputs
+
+---
+
+## 📁 Project Structure
 
 ```
-secure-aws-webapp/
-├── app/                 # Flask application with Dockerfile
-└── terraform/           # Infrastructure as Code using Terraform
-    ├── main.tf
-    ├── vpc.tf
-    ├── ecs.tf
-    ├── alb.tf
-    ├── iam.tf
-    ├── cloudwatch.tf
-    ├── variables.tf
-    ├── outputs.tf
+terraform/
+├── alb.tf
+├── cloudwatch.tf
+├── ecr.tf
+├── ecs.tf
+├── iam.tf
+├── main.tf
+├── outputs.tf
+├── variables.tf
+├── vpc.tf
 ```
 
 ---
 
-## What This Terraform Code Does
+## 🔧 Prerequisites
 
-The Terraform configuration provisions the following AWS infrastructure components:
-
-### Core Infrastructure
-
-- **VPC** with public/private subnets across two availability zones  
-- **Internet Gateway** and route tables for external access  
-- **Security Groups** for controlling inbound/outbound traffic  
-
-### ECS & Compute
-
-- **Elastic Container Registry (ECR)** to store the Flask Docker image  
-- **ECS Cluster** using Fargate launch type  
-- **Task Definition** for running the Docker container  
-- **ECS Service** for deploying the app with Fargate  
-
-### Load Balancing & Networking
-
-- **Application Load Balancer (ALB)** with:
-  - Listener on port 80 (HTTP)
-  - Target group with type `ip` for Fargate
-- Forwards web traffic to ECS tasks
-
-### IAM Roles
-
-- **ECS Task Execution Role** with ECR and CloudWatch access  
-- Fine-grained IAM policies for secure access control  
-
-### Monitoring & Logging
-
-- **CloudWatch Log Groups** to capture container logs from ECS  
+- Terraform
+- AWS CLI
+- Docker
+- AWS credentials configured (`aws configure`)
 
 ---
 
-## Prerequisites
+## 🚀 Deploying the Infrastructure
 
-Before using Terraform:
-
-- [Terraform CLI](https://developer.hashicorp.com/terraform/downloads) installed  
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) configured (`aws configure`)  
-- Docker image built and pushed to ECR  
-  See the [Flask App README](https://github.com/james1986projects/DevOpsAWS/blob/main/app/README.md) for build and push instructions.
-
----
-
-## Usage
-
-### 1. Clone the Repository
+### 1. Initialize Terraform
 
 ```bash
-git clone https://github.com/james1986projects/DevOpsAWS.git
-cd DevOpsAWS/terraform
-```
-
-### 2. Initialize Terraform
-
-```bash
+cd terraform/
 terraform init
 ```
 
-### 3. Review the Plan
+### 2. Validate and Plan
 
 ```bash
 terraform plan
 ```
 
-### 4. Apply the Configuration
+### 3. Apply the Configuration
 
 ```bash
 terraform apply
 ```
 
-Type `yes` to confirm when prompted.
+---
+
+## 📦 Build and Push Docker Image to ECR
+
+### 1. Authenticate Docker to ECR
+
+```bash
+aws ecr get-login-password --region <region> | \
+docker login --username AWS --password-stdin <aws_account_id>.dkr.ecr.<region>.amazonaws.com
+```
+
+### 2. Build the Image
+
+```bash
+docker build -t flask-app .
+```
+
+### 3. Tag the Image
+
+```bash
+docker tag flask-app:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/flask-app:latest
+```
+
+### 4. Push to ECR
+
+```bash
+docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/flask-app:latest
+```
 
 ---
 
-## Outputs
+## 🧪 Test the Deployed App
 
-After applying the Terraform configuration, the following outputs are provided:
+Use the ALB DNS name output by Terraform:
 
-- **ALB DNS Name** – Public URL to access the Flask web app  
-- **ECS Service Name**  
-- **ECS Cluster Name**
+```bash
+curl -X POST http://<alb-dns>/data \
+  -H "Content-Type: application/json" \
+  -d '{"value": "test123"}'
 
----
-
-## Terraform State
-
-This project currently uses **local Terraform state**.
-
-For collaboration or production usage, it is recommended to use a **remote backend**, such as:
-
-- **Amazon S3** for state storage  
-- **DynamoDB** for state locking  
+curl http://<alb-dns>/data
+```
 
 ---
 
-## Optional Enhancements (Planned)
+## 🔐 IAM & CloudWatch
 
-- ✅ CloudWatch logging for ECS tasks  
-- ✅ HTTPS support using ACM and a secure ALB listener  
-- ✅ ECS Service autoscaling based on CPU or memory usage  
-- ✅ S3 bucket for static file hosting or failover routing  
-- ✅ CI/CD pipeline using GitHub Actions or AWS CodePipeline  
-- ✅ Remote Terraform backend with S3 and DynamoDB  
+- ECS Task IAM role allows access to DynamoDB and CloudWatch.
+- Logs are available under `/ecs/flask-app` in CloudWatch Logs.
 
 ---
 
-This project demonstrates practical skills in AWS architecture, DevOps workflows, Infrastructure as Code, and secure application deployment.
+## 🧹 Destroy Infrastructure
+
+```bash
+terraform destroy
+```
+
+---
+
+## 📌 Notes
+
+- This setup is modular and production-ready.
+- Future improvements: S3 static file hosting, HTTPS via ACM, CI/CD pipelines, autoscaling, and remote Terraform state.
