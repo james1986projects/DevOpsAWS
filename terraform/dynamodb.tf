@@ -1,4 +1,4 @@
-# Launch Dynamo DB for flask app backend data
+#dynamodb.tf
 
 resource "aws_dynamodb_table" "flask_data" {
   name           = "flask-data"

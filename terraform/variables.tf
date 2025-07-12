@@ -1,31 +1,50 @@
-#vaitables.tf
+#variables.tf
 
 variable "region" {
-  description = "AWS region"
-  type        = string
-  default     = "us-east-1"
+  default = "us-east-1"
 }
 
-variable "dynamodb_table_name" {
-  type        = string
-  description = "Name of the DynamoDB table"
-  default     = "flask-data"
+variable "ecs_cluster_name" {
+  description = "Name of the ECS cluster"
+  default     = "flask-cluster"
+}
+
+variable "ecs_service_name" {
+  description = "Name of the ECS service"
+  default     = "flask-service"
+}
+
+variable "image_tag" {
+  description = "Docker image tag"
+  default     = "latest"
+}
+
+variable "ecs_max_capacity" {
+  description = "Maximum number of ECS tasks"
+  type        = number
+  default     = 4
+}
+
+variable "ecs_min_capacity" {
+  description = "Minimum number of ECS tasks"
+  type        = number
+  default     = 1
 }
 
 variable "ecr_repo_name" {
-  type        = string
   description = "Name of the ECR repository"
+  type        = string
   default     = "flask-app"
 }
 
-variable "ecs_cpu" {
+variable "project_name" {
+  description = "Project name for naming resources"
   type        = string
-  description = "CPU units for the ECS task"
-  default     = "256"
+  default     = "secure-aws-webapp"
 }
 
-variable "ecs_memory" {
+variable "dynamodb_table_name" {
+  description = "DynamoDB table name"
   type        = string
-  description = "Memory for the ECS task in MiB"
-  default     = "512"
+  default     = "my-flask-app-table"
 }

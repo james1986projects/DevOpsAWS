@@ -1,1 +1,0 @@
-dynamodb_table_name = "my-flask-app-table"

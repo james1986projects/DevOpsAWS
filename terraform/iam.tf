@@ -1,17 +1,17 @@
 #iam.tf
 
-data "aws_caller_identity" "current" {}
-
-# Task Execution Role: used by ECS to pull images, write logs
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [{
-      Effect    = "Allow",
-      Principal = { Service = "ecs-tasks.amazonaws.com" },
-      Action    = "sts:AssumeRole"
+      Action = "sts:AssumeRole"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+      Effect = "Allow"
+      Sid    = ""
     }]
   })
 }
@@ -21,65 +21,37 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-resource "aws_iam_policy" "ecs_task_logging_policy" {
-  name = "ecsTaskLoggingPolicy"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        Resource = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/ecs/flask-app:*"
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_task_logging_attach" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_task_logging_policy.arn
-}
-
-# Task App Role: used by your Flask app (DynamoDB)
 resource "aws_iam_role" "ecs_task_app_role" {
   name = "ecsTaskAppRole"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [{
-      Effect    = "Allow",
-      Principal = { Service = "ecs-tasks.amazonaws.com" },
-      Action    = "sts:AssumeRole"
+      Action = "sts:AssumeRole"
+      Principal = {
+        Service = "ecs-tasks.amazonaws.com"
+      }
+      Effect = "Allow"
+      Sid    = ""
     }]
   })
 }
 
-resource "aws_iam_policy" "dynamodb_access" {
-  name = "dynamodb-access-policy"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action = [
-          "dynamodb:PutItem",
-          "dynamodb:GetItem",
-          "dynamodb:Scan",
-          "dynamodb:UpdateItem",
-          "dynamodb:DeleteItem"
-        ],
-        Effect   = "Allow",
-        Resource = aws_dynamodb_table.flask_data.arn
-      }
-    ]
+resource "aws_iam_policy" "dynamodb_policy" {
+  name        = "DynamoDBAccessPolicy"
+  description = "Allows access to DynamoDB table"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:UpdateItem"]
+      Resource = "*"
+    }]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_dynamodb" {
-  role       = aws_iam_role.ecs_task_app_role.name
-  policy_arn = aws_iam_policy.dynamodb_access.arn
+resource "aws_iam_policy_attachment" "dynamodb_policy_attach" {
+  name       = "DynamoDBPolicyAttach"
+  roles      = [aws_iam_role.ecs_task_app_role.name]
+  policy_arn = aws_iam_policy.dynamodb_policy.arn
 }

@@ -1,6 +1,7 @@
-### alb.tf
-resource "aws_lb" "app_lb" {
-  name               = "flask-app-lb-fargate"
+#alb.tf
+
+resource "aws_lb" "flask_alb" {
+  name               = "flask-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -8,29 +9,25 @@ resource "aws_lb" "app_lb" {
 }
 
 resource "aws_lb_target_group" "flask_tg" {
-  name        = "flask-tg-fargate"
+  name        = "flask-tg"
   port        = 5000
   protocol    = "HTTP"
-  vpc_id      = data.aws_vpc.default.id
   target_type = "ip"
+  vpc_id      = data.aws_vpc.default.id
 
   health_check {
     path                = "/"
     protocol            = "HTTP"
     matcher             = "200"
     interval            = 30
-    timeout             = 5
+    timeout             = 10
     healthy_threshold   = 2
     unhealthy_threshold = 2
-  }
-
-  tags = {
-    Name = "flask-tg-fargate"
   }
 }
 
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.app_lb.arn
+  load_balancer_arn = aws_lb.flask_alb.arn
   port              = 80
   protocol          = "HTTP"
 
