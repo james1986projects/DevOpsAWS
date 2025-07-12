@@ -11,7 +11,7 @@ table = dynamodb.Table('flask-data')
 
 @app.route('/')
 def hello():
-    return "Hello James thanks for making me secure!"
+    return "Hello James thanks for making me secure and adding CI/CD!"
 
 @app.route('/data', methods=['POST'])
 def add_data():
