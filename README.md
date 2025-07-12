@@ -1,137 +1,44 @@
-# 🚀 Secure AWS WebApp Deployment
 
-This project demonstrates how to securely deploy a containerized Flask web application to AWS ECS Fargate using Docker and Terraform.
+## Internal Feedback Collection Web App
 
-As part of my continued learning in DevOps and cloud architecture, I'm building a production-style deployment from the ground up. The architecture will evolve over time, and I'll document troubleshooting steps and lessons learned along the way.
+This Flask application is designed as a lightweight internal tool to collect user feedback, bug reports, and feature requests within an organization. It serves staff who interact with internal SaaS tools or dashboards and want a quick way to submit input to development or support teams.
 
----
+The backend is powered by AWS DynamoDB for fast, scalable storage of structured feedback data. The entire application runs on AWS ECS Fargate behind an Application Load Balancer, providing automatic scaling and high availability. Logs are centralized in CloudWatch for observability.
 
-## 🔧 Technologies Used
+While this is a simple app, the architecture is production-grade — designed with security, scalability, and automation in mind. It showcases DevOps best practices using:
 
-- AWS ECS Fargate  
-- Docker  
-- Amazon ECR  
-- Application Load Balancer (ALB)  
-- AWS CloudWatch  
-- DynamoDB  
-- Terraform (Infrastructure as Code)  
-- Python Flask (3.11)
+- Infrastructure as Code (Terraform)
+- Remote state storage (S3 + DynamoDB)
+- Containerized deployment via ECS Fargate
+- Logging, monitoring, and autoscaling
+- Secure communication via HTTPS and optional WAF protections
+- CI/CD pipeline integration via GitHub Actions
 
----
+## Project features
 
-## 📌 Project Highlights
+This project demonstrates how to deploy and manage a scalable, secure, and observable Flask web application using AWS services and modern DevOps practices.
 
-✅ Containerized Flask app with Docker  
-✅ Infrastructure as Code using Terraform  
-✅ Deployed to ECS Fargate with ALB routing  
-✅ CloudWatch log aggregation  
-✅ DynamoDB backend for persistent data  
-✅ Modular and production-ready structure  
-✅ Scalable and extensible (CI/CD, HTTPS, autoscaling coming soon)
+### Scalability & Reliability
+- **ECS Fargate** removes the need to manage EC2 instances and handles container orchestration.
+- **Application Load Balancer (ALB)** ensures high availability and distributes traffic across multiple availability zones.
 
----
+### Security
+- **HTTPS via ACM** encrypts data in transit, securing user-submitted feedback.
+- **WAF** provides protection against common threats like SQL injection and XSS attacks. Although this is not required for a strictly internal facing app, I'm including one in the project.
+- **IAM roles and least-privilege access** are enforced via Terraform.
 
-## 🗂️ Project Structure
+### Monitoring & Observability
+- **CloudWatch Logs** capture application and infrastructure logs for debugging and alerting.
+- **ECS service autoscaling** ensures the app responds to traffic spikes.
 
-| Folder       | Description                          |
-|--------------|--------------------------------------|
-| `/app`       | Flask application and Docker setup   |
-| `/terraform` | Terraform infrastructure code (IaC)  |
-| `/docs`      | Optional: screenshots, diagrams      |
+### Infrastructure as Code
+- **Terraform modules** manage the full infrastructure in a consistent, repeatable way.
+- **Remote state storage (S3 + DynamoDB)** supports team collaboration and prevents state drift.
 
----
+### Automation & CI/CD
+- **GitHub Actions** automates Docker builds, pushes to ECR, and deploys updates to ECS.
+- Promotes rapid iteration and continuous delivery.
 
-## 📸 Architecture Diagram
-
-Coming soon – a visual diagram of the infrastructure components.
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- AWS account with credentials configured (`aws configure`)
-- Docker installed
-- Terraform installed
-
----
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/james1986projects/DevOpsAWS.git
-cd DevOpsAWS
-```
-
----
-
-### 2. Build and Push Docker Image to Amazon ECR
-
-```bash
-cd app/
-docker build -t flask-app .
-docker tag flask-app:latest <aws_account_id>.dkr.ecr.<region>.amazonaws.com/flask-app:latest
-docker push <aws_account_id>.dkr.ecr.<region>.amazonaws.com/flask-app:latest
-```
-
----
-
-### 3. Deploy the Infrastructure with Terraform
-
-```bash
-cd ../terraform
-terraform init
-terraform apply
-```
-
----
-
-## 🌐 Test the Application
-
-Use the Application Load Balancer DNS output by Terraform:
-
-```bash
-curl -X POST http://<alb-dns>/data \
-  -H "Content-Type: application/json" \
-  -d '{"value": "test123"}'
-
-curl http://<alb-dns>/data
-```
-
----
-
-## 📊 Monitoring & Logs
-
-- Logs are stored in **CloudWatch Logs** under `/ecs/flask-app`
-- DynamoDB stores the data posted to `/data`
-
----
-
-## 🧹 Teardown
-
-To remove all infrastructure:
-
-```bash
-terraform destroy
-```
-
----
-
-## 🔭 Future Improvements
-
-- Enable HTTPS with AWS ACM
-- Add CI/CD (GitHub Actions or CodePipeline)
-- Implement autoscaling for ECS
-- Enable S3 for static file hosting or failover
-- Use S3 + DynamoDB for remote Terraform state backend
-
----
-
-## 📁 Related Files
-
-- [`/app/README.md`](./app/README.md) – Flask app and Docker setup  
-- [`/terraform/README.md`](./terraform/README.md) – AWS infrastructure with Terraform  
-
----
-
+### Internal Tooling Use Case
+- This setup is ideal for internal microtools that replace manual processes (like spreadsheets or emails).
+- Scalable, secure, and production-ready — yet simple enough for fast iteration.
