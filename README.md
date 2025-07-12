@@ -14,6 +14,10 @@ While this is a simple app, the architecture is production-grade — designed wi
 - Secure communication via HTTPS and optional WAF protections
 - CI/CD pipeline integration via GitHub Actions
 
+## Architecture
+
+<img width="1536" height="1024" alt="architecturediamgram" src="https://github.com/user-attachments/assets/a7a4efb8-a7b1-4152-b3ff-67252a538ffa" />
+
 ## Project features
 
 This project demonstrates how to deploy and manage a scalable, secure, and observable Flask web application using AWS services and modern DevOps practices.
