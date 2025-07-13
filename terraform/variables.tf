@@ -48,3 +48,8 @@ variable "dynamodb_table_name" {
   type        = string
   default     = "my-flask-app-table"
 }
+
+variable "acm_certificate_arn" {
+  description = "ACM certificate ARN for HTTPS"
+  type        = string
+}
