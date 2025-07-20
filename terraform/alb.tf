@@ -1,7 +1,7 @@
 # alb.tf
 
 resource "aws_security_group" "alb_sg" {
-  name        = "alb-sg"
+  name        = "${var.environment}-alb-sg"
   description = "Allow inbound HTTP and HTTPS to ALB"
   vpc_id      = data.aws_vpc.default.id
 
@@ -26,13 +26,13 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "alb-sg"
+   tags = {
+    Name = "${var.environment}-alb-sg"
   }
 }
 
 resource "aws_lb" "flask_alb" {
-  name               = "flask-alb"
+   name              = "${var.environment}-flask-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -40,7 +40,7 @@ resource "aws_lb" "flask_alb" {
 }
 
 resource "aws_lb_target_group" "flask_tg" {
-  name        = "flask-tg"
+  name        = "${var.environment}-flask-tg"
   port        = 5000
   protocol    = "HTTP"
   target_type = "ip"

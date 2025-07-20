@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
+  name = "${var.environment}-ecsTaskExecutionRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -20,7 +20,7 @@ resource "aws_iam_role_policy_attachment" "ecs_execution_policy" {
 }
 
 resource "aws_iam_role" "ecs_task_app_role" {
-  name = "ecsTaskAppRole"
+  name = "${var.environment}-ecsTaskAppRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -36,7 +36,7 @@ resource "aws_iam_role" "ecs_task_app_role" {
 }
 
 resource "aws_iam_policy" "dynamodb_policy" {
-  name = "ecs-dynamodb-access-policy"
+  name = "${var.environment}-ecs-dynamodb-access-policy"
 
   policy = jsonencode({
     Version = "2012-10-17",

@@ -3,7 +3,7 @@
 resource "aws_appautoscaling_target" "ecs_service" {
   max_capacity       = var.ecs_max_capacity
   min_capacity       = var.ecs_min_capacity
-  resource_id        = "service/${var.ecs_cluster_name}/${var.ecs_service_name}"
+  resource_id        = "service/${aws_ecs_cluster.flask_cluster.name}/${aws_ecs_service.flask_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 
@@ -11,7 +11,7 @@ resource "aws_appautoscaling_target" "ecs_service" {
 }
 
 resource "aws_appautoscaling_policy" "scale_out" {
-  name               = "${var.project_name}-scale-out-policy"
+   name              = "${var.environment}-${var.project_name}-scale-out-policy"
   service_namespace  = "ecs"
   resource_id        = aws_appautoscaling_target.ecs_service.resource_id
   scalable_dimension = aws_appautoscaling_target.ecs_service.scalable_dimension

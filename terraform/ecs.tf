@@ -1,11 +1,11 @@
 #ecs.tf
 
 resource "aws_ecs_cluster" "flask_cluster" {
-  name = var.ecs_cluster_name
+  name = "${var.environment}-${var.ecs_cluster_name}"
 }
 
 resource "aws_ecs_task_definition" "flask_task" {
-  family                   = "flask-task"
+  family                   = "${var.environment}-flask-task"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_app_role.arn
   requires_compatibilities = ["FARGATE"]
@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "flask_task" {
 }
 
 resource "aws_ecs_service" "flask_service" {
-  name            = var.ecs_service_name
+  name            = "${var.environment}-${var.ecs_service_name}"
   cluster         = aws_ecs_cluster.flask_cluster.id
   task_definition = aws_ecs_task_definition.flask_task.arn
   desired_count   = 1

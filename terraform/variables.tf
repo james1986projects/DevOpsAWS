@@ -53,3 +53,9 @@ variable "acm_certificate_arn" {
   description = "ACM certificate ARN for HTTPS"
   type        = string
 }
+
+variable "environment" {
+  type        = string
+  description = "Deployment environment name (e.g. test, prod)"
+  default     = "dev"
+}

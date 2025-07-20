@@ -9,7 +9,7 @@ data "aws_route53_zone" "primary" {
 # Create A record (alias) pointing to your ALB
 resource "aws_route53_record" "root_domain" {
   zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "devopsjames.com"
+  name    = "${var.environment}.devopsjames.com"
   type    = "A"
 
   alias {

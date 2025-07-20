@@ -12,7 +12,7 @@ data "aws_subnets" "default" {
 }
 
 resource "aws_security_group" "ecs_sg" {
-  name        = "ecs-sg"
+  name = "${var.environment}-ecs-sg"
   description = "Allow inbound port 5000 from ALB"
   vpc_id      = data.aws_vpc.default.id
 
@@ -30,7 +30,7 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "ecs-sg"
+   tags = {
+    Name = "${var.environment}-ecs-sg"
   }
 }
