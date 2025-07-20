@@ -16,6 +16,7 @@ variable "ecs_service_name" {
 
 variable "image_tag" {
   description = "Docker image tag"
+  type        = string
   default     = "latest"
 }
 
@@ -55,7 +56,6 @@ variable "acm_certificate_arn" {
 }
 
 variable "environment" {
-  type        = string
   description = "Deployment environment name (e.g. test, prod)"
-  default     = "dev"
+  type        = string
 }

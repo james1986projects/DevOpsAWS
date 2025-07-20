@@ -5,5 +5,5 @@ module "app_stack" {
 
   acm_certificate_arn = var.acm_certificate_arn
   image_tag           = var.image_tag
-  environment         = "prod"
+  environment         = var.environment
 }
