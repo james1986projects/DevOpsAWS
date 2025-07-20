@@ -1,22 +1,19 @@
 name: Deploy to ECS
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/docker-ecr.yml'
-      - '.github/workflows/deploy-to-ecs.yml'
-      - 'app/**'
-      - 'terraform/**'
-      - '!terraform/README.md'
-      - '!app/README.md'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        default: "test"
 
 jobs:
   deploy:
     name: Deploy to ECS Fargate
     runs-on: ubuntu-latest
 
-    environment: production
+    environment: ${{ github.event.inputs.environment }}
 
     steps:
       - name: Checkout repository
@@ -32,6 +29,6 @@ jobs:
       - name: Update ECS Service
         run: |
           aws ecs update-service \
-            --cluster ${{ secrets.ECS_CLUSTER_NAME }} \
-            --service ${{ secrets.ECS_SERVICE_NAME }} \
+            --cluster ${{ secrets[format('ECS_CLUSTER_NAME_{0}', github.event.inputs.environment)] }} \
+            --service ${{ secrets[format('ECS_SERVICE_NAME_{0}', github.event.inputs.environment)] }} \
             --force-new-deployment
