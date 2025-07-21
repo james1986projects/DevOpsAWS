@@ -3,11 +3,6 @@ name: Deploy to test
 on:
   # Manual trigger via GitHub UI
   workflow_dispatch:
-    inputs:
-      environment:
-        description: "Environment to deploy to"
-        required: true
-        default: "test"
 
   # Auto-trigger on PR to develop
   pull_request:
@@ -15,7 +10,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to ECS Fargate
+    name: Deploy to ECS Fargate (test)
     runs-on: ubuntu-latest
 
     steps:
@@ -29,21 +24,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Determine environment
-        id: env
+      - name: Deploy to ECS
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "env=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
-          else
-            echo "env=test" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Update ECS Service
-        run: |
-          CLUSTER_NAME=${{ secrets[format('ECS_CLUSTER_NAME_%s', steps.env.outputs.env | upper)] }}
-          SERVICE_NAME=${{ secrets[format('ECS_SERVICE_NAME_%s', steps.env.outputs.env | upper)] }}
-
           aws ecs update-service \
-            --cluster "$CLUSTER_NAME" \
-            --service "$SERVICE_NAME" \
+            --cluster "${{ secrets.ECS_CLUSTER_NAME_TEST }}" \
+            --service "${{ secrets.ECS_SERVICE_NAME_TEST }}" \
             --force-new-deployment
