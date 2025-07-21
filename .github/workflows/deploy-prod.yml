@@ -20,12 +20,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Update ECS Service (prod)
+      - name: Deploy to ECS
         run: |
-          CLUSTER_NAME=${{ secrets.ECS_CLUSTER_NAME_PROD }}
-          SERVICE_NAME=${{ secrets.ECS_SERVICE_NAME_PROD }}
-
           aws ecs update-service \
-            --cluster "$CLUSTER_NAME" \
-            --service "$SERVICE_NAME" \
+            --cluster "${{ secrets.ECS_CLUSTER_NAME_PROD }}" \
+            --service "${{ secrets.ECS_SERVICE_NAME_PROD }}" \
             --force-new-deployment
