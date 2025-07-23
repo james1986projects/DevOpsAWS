@@ -27,3 +27,4 @@ jobs:
             --cluster "${{ secrets.ECS_CLUSTER_NAME_TEST }}" \
             --service "${{ secrets.ECS_SERVICE_NAME_TEST }}" \
             --force-new-deployment
+# trigger deploy-test workflow
