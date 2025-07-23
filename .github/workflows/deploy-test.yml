@@ -1,10 +1,7 @@
 name: Deploy to test
 
 on:
-  # Manual trigger via GitHub UI
   workflow_dispatch:
-
-  # Auto-trigger on PR to develop
   pull_request:
     branches: [develop]
 
@@ -24,7 +21,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy to ECS
+      - name: Deploy to ECS Fargate (test)
         run: |
           aws ecs update-service \
             --cluster "${{ secrets.ECS_CLUSTER_NAME_TEST }}" \
