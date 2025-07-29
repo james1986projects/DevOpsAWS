@@ -1,15 +1,14 @@
-#route53.tf
-
 # Look up your hosted zone for devopsjames.com
 data "aws_route53_zone" "primary" {
   name         = "devopsjames.com"
   private_zone = false
 }
 
-# Create A record (alias) pointing to your ALB
-resource "aws_route53_record" "root_domain" {
+# Only create the root domain record in prod
+resource "aws_route53_record" "root_domain_root" {
+  count   = var.environment == "prod" ? 1 : 0
   zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "${var.environment}.devopsjames.com"
+  name    = "devopsjames.com"
   type    = "A"
 
   alias {
@@ -19,9 +18,10 @@ resource "aws_route53_record" "root_domain" {
   }
 }
 
-resource "aws_route53_record" "root_domain_root" {
+# Always create environment-specific subdomain (e.g., test.devopsjames.com)
+resource "aws_route53_record" "root_domain" {
   zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "devopsjames.com"
+  name    = "${var.environment}.devopsjames.com"
   type    = "A"
 
   alias {

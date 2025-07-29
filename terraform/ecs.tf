@@ -15,7 +15,10 @@ resource "aws_ecs_task_definition" "flask_task" {
 
   container_definitions = jsonencode([{
     name      = "flask-container"
-    image     = "${aws_ecr_repository.flask_app.repository_url}:${var.image_tag}"
+    image = "${coalesce(
+  try(aws_ecr_repository.flask_app[0].repository_url, null),
+  try(data.aws_ecr_repository.flask_app[0].repository_url, null)
+)}:${var.image_tag}"
     essential = true
     portMappings = [{
       containerPort = 5000
