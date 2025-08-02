@@ -1,17 +1,37 @@
 from flask import Flask, request, jsonify
+from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_talisman import Talisman
 import boto3
 import uuid
 
 app = Flask(__name__)
 
-# Delayed initialization of DynamoDB table to avoid crashing at startup
+# Make Flask aware it's behind an ALB and use X-Forwarded headers
+# x_proto=1 ensures HTTPS detection
+# x_host=1 ensures correct domain in redirects
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+# Configure Flask-Talisman for HTTPS + HSTS
+# force_https=True -> redirect HTTP to HTTPS
+# strict_transport_security=True -> adds Strict-Transport-Security header
+# strict_transport_security_max_age -> 1 year (recommended)
+# include_subdomains=True -> apply to *.devopsjames.com
+Talisman(
+    app,
+    force_https=True,
+    strict_transport_security=True,
+    strict_transport_security_max_age=31536000,  # 1 year
+    strict_transport_security_include_subdomains=True
+)
+
+# DynamoDB lazy initialization
 def get_table():
     dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
     return dynamodb.Table('flask-data')
 
 @app.route('/')
 def hello():
-    return "Hello James thanks for making me secure and adding CI/CD!"
+    return "Hello James! Fully secure with HTTPS + HSTS + CI/CD-ready!"
 
 @app.route('/data', methods=['POST'])
 def add_data():

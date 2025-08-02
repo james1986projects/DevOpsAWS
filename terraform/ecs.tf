@@ -48,10 +48,17 @@ resource "aws_ecs_service" "flask_service" {
   desired_count   = 1
   launch_type     = "FARGATE"
 
+  health_check_grace_period_seconds = 60
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
   network_configuration {
-    subnets         = data.aws_subnets.default.ids
+    subnets          = data.aws_subnets.default.ids
     assign_public_ip = true
-    security_groups = [aws_security_group.ecs_sg.id]
+    security_groups  = [aws_security_group.ecs_sg.id]
   }
 
   load_balancer {

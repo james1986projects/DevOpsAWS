@@ -47,13 +47,13 @@ resource "aws_lb_target_group" "flask_tg" {
   vpc_id      = data.aws_vpc.default.id
 
   health_check {
-    path                = "/"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 30
-    timeout             = 10
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+  path                = "/"
+  protocol            = "HTTP"
+  matcher             = "200-399" # Accepts success + redirects
+  interval            = 15        # Checks every 15s (faster detection)
+  timeout             = 5         # Each check waits 5s
+  healthy_threshold   = 2         # 2 passes = healthy
+  unhealthy_threshold = 5         # 5 fails (~75s) = unhealthy
   }
 }
 
@@ -78,7 +78,9 @@ resource "aws_lb_listener" "https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = var.acm_certificate_arn
+  depends_on     = [aws_acm_certificate_validation.wildcard]
+certificate_arn = aws_acm_certificate.wildcard.arn
+
 
   default_action {
     type             = "forward"

@@ -1,2 +1,5 @@
-flask
+Flask
+Werkzeug
 boto3
+flask-talisman
+gunicorn

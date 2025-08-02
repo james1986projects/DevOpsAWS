@@ -17,7 +17,6 @@ variable "ecs_service_name" {
 variable "image_tag" {
   description = "Docker image tag"
   type        = string
-  default     = "latest"
 }
 
 variable "ecs_max_capacity" {
@@ -48,11 +47,6 @@ variable "dynamodb_table_name" {
   description = "DynamoDB table name"
   type        = string
   default     = "my-flask-app-table"
-}
-
-variable "acm_certificate_arn" {
-  description = "ACM certificate ARN for HTTPS"
-  type        = string
 }
 
 variable "environment" {
