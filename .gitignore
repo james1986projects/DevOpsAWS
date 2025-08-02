@@ -16,13 +16,17 @@ docker-compose.override.yml
 # Terraform
 *.tfstate
 *.tfstate.*
+*.tfplan
 .terraform/
 crash.log
+*.backup
+# Ignore secrets
 *.tfvars
 override.tf
 override.tf.json
 terraform.tfvars.json
-*.backup
+# Keep provider lock file
+!.terraform.lock.hcl
 
 # VS Code / IDEs
 .vscode/
