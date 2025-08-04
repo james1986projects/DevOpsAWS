@@ -1,55 +1,40 @@
-#variables.tf
-
 variable "region" {
   default = "us-east-1"
 }
 
-variable "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  default     = "flask-cluster"
-}
-
-variable "ecs_service_name" {
-  description = "Name of the ECS service"
-  default     = "flask-service"
-}
-
-variable "image_tag" {
-  description = "Docker image tag"
+variable "environment" {
+  description = "Deployment environment name (e.g., test, prod)"
   type        = string
-}
-
-variable "ecs_max_capacity" {
-  description = "Maximum number of ECS tasks"
-  type        = number
-  default     = 4
 }
 
 variable "ecs_min_capacity" {
-  description = "Minimum number of ECS tasks"
-  type        = number
-  default     = 1
+  type = number
+}
+
+variable "ecs_max_capacity" {
+  type = number
+}
+
+variable "image_tag" {
+  type = string
+}
+
+variable "ecs_cluster_name" {
+  default = "flask-cluster"
+}
+
+variable "ecs_service_name" {
+  default = "flask-service"
 }
 
 variable "ecr_repo_name" {
-  description = "Name of the ECR repository"
-  type        = string
-  default     = "flask-app"
+  default = "flask-app"
 }
 
 variable "project_name" {
-  description = "Project name for naming resources"
-  type        = string
-  default     = "secure-aws-webapp"
+  default = "secure-aws-webapp"
 }
 
 variable "dynamodb_table_name" {
-  description = "DynamoDB table name"
-  type        = string
-  default     = "my-flask-app-table"
-}
-
-variable "environment" {
-  description = "Deployment environment name (e.g. test, prod)"
-  type        = string
+  default = "my-flask-app-table"
 }

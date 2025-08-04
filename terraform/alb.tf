@@ -1,5 +1,6 @@
-# alb.tf
-
+# -----------------------
+# ALB Security Group
+# -----------------------
 resource "aws_security_group" "alb_sg" {
   name        = "${var.environment}-alb-sg"
   description = "Allow inbound HTTP and HTTPS to ALB"
@@ -26,13 +27,16 @@ resource "aws_security_group" "alb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-   tags = {
+  tags = {
     Name = "${var.environment}-alb-sg"
   }
 }
 
+# -----------------------
+# Application Load Balancer
+# -----------------------
 resource "aws_lb" "flask_alb" {
-   name              = "${var.environment}-flask-alb"
+  name               = "${var.environment}-flask-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -47,16 +51,19 @@ resource "aws_lb_target_group" "flask_tg" {
   vpc_id      = data.aws_vpc.default.id
 
   health_check {
-  path                = "/"
-  protocol            = "HTTP"
-  matcher             = "200-399" # Accepts success + redirects
-  interval            = 15        # Checks every 15s (faster detection)
-  timeout             = 5         # Each check waits 5s
-  healthy_threshold   = 2         # 2 passes = healthy
-  unhealthy_threshold = 5         # 5 fails (~75s) = unhealthy
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200-399"
+    interval            = 15
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 5
   }
 }
 
+# -----------------------
+# ALB Listeners
+# -----------------------
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.flask_alb.arn
   port              = 80
@@ -64,7 +71,6 @@ resource "aws_lb_listener" "http" {
 
   default_action {
     type = "redirect"
-
     redirect {
       port        = "443"
       protocol    = "HTTPS"
@@ -78,12 +84,12 @@ resource "aws_lb_listener" "https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  depends_on     = [aws_acm_certificate_validation.wildcard]
-certificate_arn = aws_acm_certificate.wildcard.arn
 
+  certificate_arn = var.environment == "prod" ? aws_acm_certificate.wildcard[0].arn : data.aws_acm_certificate.existing[0].arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.flask_tg.arn
   }
 }
+

@@ -67,8 +67,9 @@ resource "aws_ecs_service" "flask_service" {
     container_port   = 5000
   }
 
+  # Ensure ECS service only starts after ALB + listeners are fully ready
   depends_on = [
     aws_lb_listener.http,
-    aws_ecs_task_definition.flask_task
+    aws_lb_listener.https
   ]
 }

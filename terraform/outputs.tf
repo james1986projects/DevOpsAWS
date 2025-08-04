@@ -1,5 +1,3 @@
-#outputs.tf
-
 output "alb_dns_name" {
   value = aws_lb.flask_alb.dns_name
 }
@@ -10,4 +8,11 @@ output "ecs_cluster_name" {
 
 output "ecs_service_name" {
   value = aws_ecs_service.flask_service.name
+}
+
+output "ecr_repo_url" {
+  value = coalesce(
+    try(aws_ecr_repository.flask_app[0].repository_url, null),
+    try(data.aws_ecr_repository.flask_app[0].repository_url, null)
+  )
 }
