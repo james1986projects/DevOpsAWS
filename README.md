@@ -1,50 +1,96 @@
+# Internal Feedback Collection Web App
 
-## Internal Feedback Collection Web App
+![Deploy to Test](https://github.com/james1986projects/DevOpsAWS/actions/workflows/deploy-test.yml/badge.svg)
+![Deploy to Prod](https://github.com/james1986projects/DevOpsAWS/actions/workflows/deploy-prod.yml/badge.svg)
 
-This Flask application is designed as a lightweight internal tool to collect user feedback, bug reports, and feature requests within an organization. It serves staff who interact with internal SaaS tools or dashboards and want a quick way to submit input to development or support teams.
+🌐 **Live Demo:** [https://devopsjames.com](https://devopsjames.com)
 
-The backend is powered by AWS DynamoDB for fast, scalable storage of structured feedback data. The entire application runs on AWS ECS Fargate behind an Application Load Balancer (ALB), with HTTPS and custom domain support via Route 53 and ACM. Logs are centralized in CloudWatch for observability.
+This repository demonstrates a **production-grade, containerized Flask web application** deployed to **AWS ECS Fargate**, showcasing **cloud, DevOps, and CI/CD best practices**.  
 
-While this is a simple app, the architecture is production-grade — designed with security, scalability, and automation in mind. It showcases DevOps best practices using:
+Key highlights:
 
-- Infrastructure as Code (Terraform)
-- Remote state storage (S3 + DynamoDB locking)
-- Containerized deployment via ECS Fargate
-- HTTPS and DNS via ACM and Route 53
-- IAM roles for least-privilege access to DynamoDB
-- Logging, monitoring, and autoscaling
-- CI/CD pipeline integration via GitHub Actions
+- **Infrastructure as Code** with Terraform (modular, multi-environment)  
+- **Multi-environment CI/CD** via GitHub Actions (develop → test, main → prod)  
+- **Secure & Scalable AWS Architecture** (ECR, ALB, ACM, DynamoDB, CloudWatch)  
+- **Full observability & automation** with logging, autoscaling, and IaC
 
-## Architecture
+![Architecture](https://github.com/user-attachments/assets/a7a4efb8-a7b1-4152-b3ff-67252a538ffa)
 
-<img width="1536" height="1024" alt="architecturediamgram" src="https://github.com/user-attachments/assets/a7a4efb8-a7b1-4152-b3ff-67252a538ffa" />
+---
 
-## Project Features
+## 📄 Documentation
 
-This project demonstrates how to deploy and manage a scalable, secure, and observable Flask web application using AWS services and modern DevOps practices.
+- [CI/CD Pipeline Overview](./CICD.md)
+- [Terraform Infrastructure](./terraform)
+- [Flask Application Source](./app)
 
-### Scalability & Reliability
-- **ECS Fargate** removes the need to manage EC2 instances and handles container orchestration.
-- **Application Load Balancer (ALB)** ensures high availability and distributes traffic across multiple availability zones.
+---
 
-### Security
-- **HTTPS via ACM** encrypts data in transit with TLS certificates managed by AWS.
-- **Route 53** manages a custom domain (`devopsjames.com`) with automatic DNS propagation.
-- **IAM task roles** provide scoped, least-privilege access to the DynamoDB backend.
-- **WAF** (optional) protects against threats like SQL injection and XSS. Although not strictly necessary for internal-only apps, it’s included to demonstrate secure practices.
+## 🔹 Project Overview
 
-### Monitoring & Observability
-- **CloudWatch Logs** capture application and infrastructure logs for debugging and alerting.
-- **ECS service autoscaling** ensures the app can respond to load increases.
+This **Internal Feedback Collection Web App** is a lightweight tool for collecting:
 
-### Infrastructure as Code
-- **Terraform modules** manage the full infrastructure in a consistent, repeatable way.
-- **Remote backend** uses S3 (for storage) and DynamoDB (for state locking) to support team workflows and prevent state drift.
+- Bug reports  
+- Feature requests  
+- General internal feedback
 
-### Automation & CI/CD
-- **GitHub Actions** pipeline builds Docker images, pushes to ECR, and triggers ECS Fargate deployments.
-- Supports rapid iteration and consistent delivery to production.
+Ideal for **internal SaaS tools** or dashboards, it allows staff to quickly submit input to dev or support teams.
 
-### Internal Tooling Use Case
-- This setup is ideal for internal microtools that replace manual processes (like spreadsheets or emails).
-- Scalable, secure, and production-ready — yet simple enough for fast iteration.
+The project demonstrates how to:
+
+- Design **scalable, secure AWS cloud infrastructure**  
+- Automate deployments with **multi-environment CI/CD**  
+- Apply **Infrastructure as Code (IaC)** principles with **Terraform**
+
+---
+
+## 🔹 Key Features
+
+### **1. Scalability & Reliability**
+- **AWS ECS Fargate** handles container orchestration without EC2 management  
+- **Application Load Balancer (ALB)** provides high availability across AZs  
+- **ECS Autoscaling** ensures the app adapts to load changes
+
+### **2. Security**
+- **HTTPS via ACM** encrypts traffic end-to-end  
+- **Route 53 + ALB** manage DNS and SSL seamlessly  
+- **IAM task roles** grant least-privilege access to **DynamoDB**  
+- **Optional AWS WAF** for protection against XSS/SQLi attacks
+
+### **3. Observability**
+- **AWS CloudWatch Logs** capture application & infrastructure logs  
+- Integrated with ECS for task-level logging
+
+### **4. Automation & CI/CD**
+- **GitHub Actions** builds & pushes Docker images to **Amazon ECR**  
+- **ECS Service Deployment** automatically triggered on each branch push:
+  - `develop` → Test Environment (`test-latest` image)
+  - `main` → Production Environment (`prod-latest` image)
+
+### **5. Infrastructure as Code**
+- **Terraform Modules** manage VPC, ECS, ALB, IAM, DynamoDB, and logging  
+- **Remote backend** (S3 + DynamoDB) prevents state drift in team workflows
+
+---
+
+## 🚀 Deployment Workflow
+
+1. Developer pushes to `develop` → **Deploy to Test**  
+2. Validate functionality in the test environment  
+3. Merge `develop → main` → **Deploy to Production**
+
+The CI/CD pipeline ensures **fast, repeatable, and safe deployments**.
+
+---
+
+## 🏆 Skills Demonstrated
+
+- **Cloud Architecture** (AWS ECS, ALB, DynamoDB, ACM, CloudWatch)  
+- **Infrastructure as Code** (Terraform with remote state)  
+- **CI/CD & Automation** (GitHub Actions, Docker, ECR, ECS)  
+- **Security Best Practices** (IAM least privilege, HTTPS, optional WAF)  
+- **Scalable Application Deployment** with autoscaling & observability
+
+---
+
+> This repository is designed to **demonstrate professional DevOps and cloud engineering skills** and is suitable as a **portfolio project for job applications**.
