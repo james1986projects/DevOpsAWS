@@ -21,7 +21,8 @@ resource "aws_route53_record" "root_domain_root" {
 # Always create environment-specific subdomain (e.g., test.devopsjames.com)
 resource "aws_route53_record" "root_domain" {
   zone_id = data.aws_route53_zone.primary.zone_id
-  name    = "${var.environment}.devopsjames.com"
+  name = "devopsjames.com"
+
   type    = "A"
 
   alias {
