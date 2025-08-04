@@ -92,5 +92,3 @@ The CI/CD pipeline ensures **fast, repeatable, and safe deployments**.
 - **Scalable Application Deployment** with autoscaling & observability
 
 ---
-
-> This repository is designed to **demonstrate professional DevOps and cloud engineering skills** and is suitable as a **portfolio project for job applications**.
