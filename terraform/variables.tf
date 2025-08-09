@@ -81,6 +81,7 @@ variable "dynamodb_table_name" {
 }
 
 variable "acm_certificate_arn" {
-  description = "ACM certificate ARN for HTTPS"
+  description = "ACM certificate ARN for HTTPS (optional). If not set, prod uses a created cert; non-prod uses the most recent existing wildcard cert."
   type        = string
+  default     = null
 }

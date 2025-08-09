@@ -1,18 +1,17 @@
-# =========================
-# ACM Certificate Management
-# =========================
+# acm.tf
 
-# Create ACM only in prod
+#############################
+# PROD: create apex + wildcard cert
+#############################
 resource "aws_acm_certificate" "root_and_wildcard" {
-  count = var.environment == "prod" ? 1 : 0
-
+  count                     = var.environment == "prod" ? 1 : 0
   domain_name               = "devopsjames.com"
   subject_alternative_names = ["*.devopsjames.com"]
   validation_method         = "DNS"
 
   tags = {
     Name        = "root-and-wildcard-devopsjames"
-    Environment = "shared"
+    Environment = "prod"
   }
 
   lifecycle {
@@ -20,32 +19,44 @@ resource "aws_acm_certificate" "root_and_wildcard" {
   }
 }
 
-# DNS validation (prod only)
-resource "aws_route53_record" "root_and_wildcard_validation" {
-  for_each = var.environment == "prod" ? {
-    for dvo in aws_acm_certificate.root_and_wildcard[0].domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      type   = dvo.resource_record_type
-      record = dvo.resource_record_value
-    }
+#############################
+# Dedupe validation options by CNAME name
+# (ACM often returns the SAME CNAME for root and wildcard)
+#############################
+locals {
+  dvo_grouped = var.environment == "prod" ? {
+    for name, list in {
+      for dvo in aws_acm_certificate.root_and_wildcard[0].domain_validation_options :
+      dvo.resource_record_name => dvo...
+    } : name => list[0]
   } : {}
-
-  zone_id = data.aws_route53_zone.primary.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = 60
-  records = [each.value.record]
 }
 
-# Validate ACM certificate (prod only)
+#####################################
+# PROD: DNS validation records (deduped)
+#####################################
+resource "aws_route53_record" "root_and_wildcard_validation" {
+  for_each        = local.dvo_grouped
+  zone_id         = data.aws_route53_zone.primary.zone_id
+  name            = each.value.resource_record_name
+  type            = each.value.resource_record_type
+  ttl             = 60
+  allow_overwrite = true
+  records         = [each.value.resource_record_value]
+}
+
+#####################################
+# PROD: complete validation after DNS records exist
+#####################################
 resource "aws_acm_certificate_validation" "root_and_wildcard" {
-  count = var.environment == "prod" ? 1 : 0
-
+  count                   = var.environment == "prod" ? 1 : 0
   certificate_arn         = aws_acm_certificate.root_and_wildcard[0].arn
-  validation_record_fqdns = [for record in aws_route53_record.root_and_wildcard_validation : record.fqdn]
+  validation_record_fqdns = [for r in values(aws_route53_record.root_and_wildcard_validation) : r.fqdn]
 }
 
-# For non-prod, read existing ACM certificate
+#####################################
+# NON-PROD: look up an existing issued wildcard cert
+#####################################
 data "aws_acm_certificate" "existing" {
   count       = var.environment != "prod" ? 1 : 0
   domain      = "*.devopsjames.com"

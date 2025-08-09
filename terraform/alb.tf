@@ -61,6 +61,14 @@ resource "aws_lb_target_group" "flask_tg" {
   }
 }
 
+locals {
+  resolved_cert_arn = coalesce(
+    var.acm_certificate_arn,
+    try(aws_acm_certificate.root_and_wildcard[0].arn, null),
+    try(data.aws_acm_certificate.existing[0].arn, null)
+  )
+}
+
 # -----------------------
 # ALB Listeners
 # -----------------------
@@ -84,12 +92,12 @@ resource "aws_lb_listener" "https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-
-  certificate_arn = var.environment == "prod" ? aws_acm_certificate.wildcard[0].arn : data.aws_acm_certificate.existing[0].arn
+  certificate_arn   = local.resolved_cert_arn
 
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.flask_tg.arn
   }
 }
+
 

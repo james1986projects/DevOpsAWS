@@ -1,20 +1,17 @@
-#backend-resources.tf
-
 provider "aws" {
   region = "us-east-1"
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "secure-aws-webapp-tfstate"
+  bucket        = "secure-aws-webapp-tfstate"
+  force_destroy = true
 
   tags = {
     Name = "Terraform State Bucket"
   }
-
-  force_destroy = false
 }
 
-resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
+resource "aws_s3_bucket_versioning" "versioning" {
   bucket = aws_s3_bucket.terraform_state.id
 
   versioning_configuration {
@@ -22,7 +19,7 @@ resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_encryption" {
+resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
   bucket = aws_s3_bucket.terraform_state.id
 
   rule {
@@ -32,12 +29,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_e
   }
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "terraform_state_lifecycle" {
+resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
   bucket = aws_s3_bucket.terraform_state.id
 
   rule {
-    id     = "expire-noncurrent-versions"
+    id     = "expire-old-versions"
     status = "Enabled"
+
+    filter {}  # apply to entire bucket
 
     noncurrent_version_expiration {
       noncurrent_days = 30
@@ -46,7 +45,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state_lifecycle" {
 }
 
 resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "terraform-locks"
+  name         = "terraform-locks"  # <- Matches backend.tfvars
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
@@ -59,4 +58,3 @@ resource "aws_dynamodb_table" "terraform_locks" {
     Name = "Terraform Lock Table"
   }
 }
-
